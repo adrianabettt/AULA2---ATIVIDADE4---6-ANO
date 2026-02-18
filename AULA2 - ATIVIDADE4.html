@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Aula 2 - Atividade 02: O Jogo e a Reação</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f0fa; color: #333; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .header { background-color: #8e44ad; color: white; width: 100%; max-width: 850px; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+        .container { background: white; width: 100%; max-width: 850px; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .game-card { border: 2px solid #eee; border-radius: 10px; margin-bottom: 30px; overflow: hidden; display: flex; flex-direction: column; }
+        .game-banner { width: 100%; height: 200px; overflow: hidden; background: #000; }
+        .game-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .game-title { background: #fdfaff; padding: 10px 20px; border-bottom: 1px solid #eee; font-weight: bold; color: #8e44ad; font-size: 18px; }
+        .questions { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .question-block p { font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #555; height: 40px; }
+        select { padding: 12px; border: 2px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px; cursor: pointer; }
+        select.correct { border-color: #2ecc71; background-color: #e8f8f1; color: #27ae60; font-weight: bold; }
+        button { background-color: #8e44ad; color: white; border: none; padding: 15px 50px; border-radius: 8px; cursor: pointer; font-size: 18px; margin-top: 10px; font-weight: bold; box-shadow: 0 4px #6c3483; transition: 0.2s; }
+        button:hover { background-color: #9b59b6; transform: scale(1.02); }
+        #resultado { margin-top: 20px; font-size: 22px; font-weight: bold; text-align: center; display: none; padding: 20px; border-radius: 8px; width: 100%; max-width: 850px; }
+        
+        @media (max-width: 600px) { .questions { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>AULA 2 - ATIVIDADE 02: O JOGO E A REAÇÃO</h1>
+    <p>Analise a imagem e selecione a Entrada e a Saída corretas de cada jogo.</p>
+</div>
+
+<div class="container" id="jogo-container"></div>
+
+<center><button onclick="verificar()">FINALIZAR E VER NOTA</button></center>
+<div id="resultado"></div>
+
+<script>
+    const jogos = [
+        {
+            titulo: "Dino (Google Chrome)",
+            img: "https://tse3.mm.bing.net/th/id/OIP.73eZTDH6i-ArF-ChGZmosQHaD4?cb=defcachec2&rs=1&pid=ImgDetMain&o=7&rm=3",
+            opcoes_entrada: ["Mover o mouse", "Apertar tecla Espaço", "Olhar para a tela"],
+            opcoes_saida: ["O Dino corre mais devagar", "O Dino pula o obstáculo", "O jogo fecha sozinho"],
+            correto_ent: 1, correto_sai: 1
+        },
+        {
+            titulo: "Flappy Bird",
+            img: "https://images.launchbox-app.com/b28b0f15-0644-4eb0-a6d2-8e2a4037d011.jpg",
+            opcoes_entrada: ["Gritar com o celular", "Clicar na tela", "Balançar o aparelho"],
+            opcoes_saida: ["O pássaro bate asas e sobe", "O pássaro solta fogo", "O cano muda de cor"],
+            correto_ent: 1, correto_sai: 0
+        },
+        {
+            titulo: "Minecraft (Quebrar Bloco)",
+            img: "https://s2-techtudo.glbimg.com/B1HmPIV2K01pCslKU6BdRaF2HhM=/0x0:695x390/600x0/smart/filters:gifv():strip_icc()/i.s3.glbimg.com/v1/AUTH_08fbf48bc0524877943fe86e43087e7a/internal_photos/bs/2021/l/W/MBtzkPRbyDz1Q5DxD4tQ/2014-02-05-minecraft-picareta-madeira.jpg",
+            opcoes_entrada: ["Falar no microfone", "Esperar o tempo", "Segurar clique do mouse"],
+            opcoes_saida: ["O sol brilha mais forte", "O bloco quebra e desaparece", "O personagem senta no chão"],
+            correto_ent: 2, correto_sai: 1
+        },
+        {
+            titulo: "Pac-Man (Direção)",
+            img: "https://public-rf-upload.minhawebradio.net/29/editor/56382d474474dc0d92c37f42048973f3.jpg",
+            opcoes_entrada: ["Girar o monitor", "Pressionar as setas", "Apertar botão desligar"],
+            opcoes_saida: ["O fantasma fica azul", "O cenário muda de cor", "O personagem muda de direção"],
+            correto_ent: 1, correto_sai: 2
+        },
+        {
+            titulo: "Fruit Ninja (Cortar)",
+            img: "https://cdn.prod.website-files.com/5fa23905123118739c5e21e2/66fb362949bd26dcef72f1d3_64dd8a5de4ae723b46abd674_FNCBG%20(1).jpg",
+            opcoes_entrada: ["Assoprar a tela", "Deslizar o dedo na tela", "Apertar volume"],
+            opcoes_saida: ["A fruta corta ao meio", "A fruta explode em tinta", "O jogo pausa"],
+            correto_ent: 1, correto_sai: 0
+        }
+    ];
+
+    const container = document.getElementById('jogo-container');
+    jogos.forEach((j, index) => {
+        container.innerHTML += `
+            <div class="game-card">
+                <div class="game-banner"><img src="${j.img}"></div>
+                <div class="game-title">${index+1}. ${j.titulo}</div>
+                <div class="questions">
+                    <div class="question-block">
+                        <p>1. Qual é a ENTRADA (Ação)?</p>
+                        <select id="ent${index}">
+                            <option value="">Selecione...</option>
+                            <option value="0">${j.opcoes_entrada[0]}</option>
+                            <option value="1">${j.opcoes_entrada[1]}</option>
+                            <option value="2">${j.opcoes_entrada[2]}</option>
+                        </select>
+                    </div>
+                    <div class="question-block">
+                        <p>2. Qual é a SAÍDA (Reação)?</p>
+                        <select id="sai${index}">
+                            <option value="">Selecione...</option>
+                            <option value="0">${j.opcoes_saida[0]}</option>
+                            <option value="1">${j.opcoes_saida[1]}</option>
+                            <option value="2">${j.opcoes_saida[2]}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    function verificar() {
+        let acertos = 0;
+        const totalPerguntas = jogos.length * 2;
+
+        jogos.forEach((j, index) => {
+            const ent = document.getElementById(`ent${index}`);
+            const sai = document.getElementById(`sai${index}`);
+
+            if(parseInt(ent.value) === j.correto_ent) { ent.classList.add('correct'); acertos++; } 
+            else { ent.classList.remove('correct'); }
+
+            if(parseInt(sai.value) === j.correto_sai) { sai.classList.add('correct'); acertos++; } 
+            else { sai.classList.remove('correct'); }
+        });
+
+        let nota = (acertos * 10) / totalPerguntas;
+        const resDiv = document.getElementById('resultado');
+        resDiv.style.display = "block";
+        
+        let cor = nota >= 7 ? "#2ecc71" : (nota >= 5 ? "#f1c40f" : "#e67e22");
+        resDiv.style.border = `3px solid ${cor}`;
+        resDiv.style.color = cor;
+        resDiv.style.backgroundColor = "#fff";
+        resDiv.innerHTML = `NOTA FINAL: ${nota.toFixed(1)}<br>Acertos: ${acertos} de ${totalPerguntas}`;
+        
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
